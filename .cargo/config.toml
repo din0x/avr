@@ -1,0 +1,15 @@
+[target.avr-none]
+linker = "../avr8-gnu/bin/avr-gcc.exe"
+runner = "python flash.py"
+
+[build]
+target = "avr-none"
+
+rustflags = [
+    "-C", "panic=abort",
+    "-C", "target-cpu=atmega16a",
+    "-C", "code-model=small",
+]
+
+[unstable]
+build-std = ["core"]
