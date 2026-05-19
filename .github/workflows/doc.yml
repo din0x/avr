@@ -21,7 +21,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: x86_64-unknown-linux-gnu
+          toolchain: nightly-x86_64-unknown-linux-gnu
           components: rust-docs  # ensure we have the nightly docs tools
 
       - name: Build Documentation
