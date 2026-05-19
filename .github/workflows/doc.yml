@@ -22,7 +22,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           toolchain: nightly-x86_64-unknown-linux-gnu
-          components: rust-docs  # ensure we have the nightly docs tools
+          components: rust-docs, rust-src  # ensure we have the nightly docs tools
 
       - name: Build Documentation
         run: |
