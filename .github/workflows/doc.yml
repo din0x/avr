@@ -31,6 +31,7 @@ jobs:
 
       - name: Add index.html redirect
         run: |
+          ls
           # echo '<meta http-equiv="refresh" content="0; url=avr/index.html">' > target/doc/index.html
 
       - name: Setup Pages
