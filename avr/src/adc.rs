@@ -1,19 +1,32 @@
-use core::ptr::{read_volatile, write_volatile};
 use crate::{
-    peripherals::Periph,
+    hal::Steal,
     pins::*,
     registers::{ADCH, ADCL, ADCSRA, ADMUX},
+    spi::Uninit,
 };
+use core::ptr::{read_volatile, write_volatile};
 
-pub struct Adc {
-    _periph: Periph<Self>,
+pub struct Adc<S> {
+    _state: S,
     reference: Reference,
     _prescaler: Prescaler,
 }
 
-impl Adc {
+impl Steal for Adc<Uninit> {
+    unsafe fn steal() -> Self {
+        Self {
+            _state: Uninit,
+            reference: Reference::ARef,
+            _prescaler: Prescaler::Div2,
+        }
+    }
+}
+
+pub struct Init;
+
+impl Adc<Uninit> {
     #[inline(never)]
-    pub fn new(periph: Periph<Self>, reference: Reference, prescaler: Prescaler) -> Self {
+    pub fn into_init(self, reference: Reference, prescaler: Prescaler) -> Adc<Init> {
         unsafe {
             // Set reference (MUX bits cleared → channel 0 by default)
             write_volatile(ADMUX, reference as u8);
@@ -27,13 +40,15 @@ impl Adc {
             while read_volatile(ADCSRA) & ADSC > 0 {}
         }
 
-        Self {
-            _periph: periph,
+        Adc {
+            _state: Init,
             reference,
             _prescaler: prescaler,
         }
     }
+}
 
+impl Adc<Init> {
     #[inline(always)]
     pub fn read_blocking<P: AdcChannel>(&mut self, pin: &P) -> u16 {
         _ = pin;

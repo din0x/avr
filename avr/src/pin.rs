@@ -1,14 +1,11 @@
 use core::ptr::{read_volatile, write_volatile};
 
 // Sets the pin into write mode.
-pub struct Output<P: Gpio>(P);
+pub struct Output<P: Pin>(P);
 
-impl<P: Gpio> Output<P> {
-    pub(crate) fn new(pin: P) -> Self {
-        unsafe {
-            write_volatile(P::DDR, read_volatile(P::DDR) | P::MASK);
-        }
-
+impl<P: Pin> Output<P> {
+    pub(crate) fn new(mut pin: P) -> Self {
+        pin.enable_output();
         Self(pin)
     }
 
@@ -38,12 +35,24 @@ impl<P: Gpio> Output<P> {
     }
 }
 
-pub unsafe trait Gpio: Sized {
+pub unsafe trait Pin: Sized {
     const PORT: *mut u8;
     const DDR: *mut u8;
     #[allow(unused)]
     const PIN: *mut u8;
     const MASK: u8;
+
+    fn enable_output(&mut self) {
+        unsafe {
+            write_volatile(Self::DDR, read_volatile(Self::DDR) | Self::MASK);
+        }
+    }
+
+    fn disable_output(&mut self) {
+        unsafe {
+            write_volatile(Self::DDR, read_volatile(Self::DDR) & !Self::MASK);
+        }
+    }
 
     fn into_output(self) -> Output<Self> {
         Output::new(self)

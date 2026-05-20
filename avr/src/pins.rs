@@ -1,4 +1,5 @@
-use crate::gpio::Gpio;
+use core::marker::PhantomData;
+use crate::{pin::Pin, hal::Steal};
 
 macro_rules! pins {
     (
@@ -13,8 +14,8 @@ macro_rules! pins {
             )*
         }
 
-        impl Pins {
-            pub unsafe fn steal() -> Self {
+        impl Steal for Pins {
+            unsafe fn steal() -> Self {
                 unsafe {
                     Self {
                         $(
@@ -26,17 +27,17 @@ macro_rules! pins {
         }
 
         $(
-            #[allow(unused)]
-            pub struct $ty(());
+            // pins must be !Send, !Sync
+            pub struct $ty(PhantomData<*mut ()>);
 
             impl $ty {
                 #[allow(unused)]
                 pub unsafe fn steal() -> Self {
-                    Self(())
+                    Self(PhantomData)
                 }
             }
 
-            unsafe impl Gpio for $ty {
+            unsafe impl Pin for $ty {
                 const PORT: *mut u8 = crate::registers::$port;
                 const DDR: *mut u8 = crate::registers::$ddr;
                 const PIN: *mut u8 = crate::registers::$pin;

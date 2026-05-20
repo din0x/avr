@@ -1,8 +1,8 @@
-use core::fmt;
 use crate::{
     delay::{delay_ms, delay_us},
-    gpio::{Gpio, Output},
+    pin::{Pin, Output},
 };
+use core::fmt;
 
 enum Command {
     ClearDisplay = 0x01,
@@ -17,12 +17,12 @@ enum Command {
 
 pub struct Lcd4<D7, D6, D5, D4, E, Rs>
 where
-    D7: Gpio,
-    D6: Gpio,
-    D5: Gpio,
-    D4: Gpio,
-    E: Gpio,
-    Rs: Gpio,
+    D7: Pin,
+    D6: Pin,
+    D5: Pin,
+    D4: Pin,
+    E: Pin,
+    Rs: Pin,
 {
     pub d7: Output<D7>,
     pub d6: Output<D6>,
@@ -34,12 +34,12 @@ where
 
 impl<D7, D6, D5, D4, E, Rs> Lcd4<D7, D6, D5, D4, E, Rs>
 where
-    D7: Gpio,
-    D6: Gpio,
-    D5: Gpio,
-    D4: Gpio,
-    E: Gpio,
-    Rs: Gpio,
+    D7: Pin,
+    D6: Pin,
+    D5: Pin,
+    D4: Pin,
+    E: Pin,
+    Rs: Pin,
 {
     #[inline(never)]
     pub fn init(&mut self) {
@@ -128,12 +128,12 @@ where
 
 impl<D7, D6, D5, D4, E, Rs> fmt::Write for Lcd4<D7, D6, D5, D4, E, Rs>
 where
-    D7: Gpio,
-    D6: Gpio,
-    D5: Gpio,
-    D4: Gpio,
-    E: Gpio,
-    Rs: Gpio,
+    D7: Pin,
+    D6: Pin,
+    D5: Pin,
+    D4: Pin,
+    E: Pin,
+    Rs: Pin,
 {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write(s);

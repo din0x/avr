@@ -3,10 +3,10 @@
 
 use avr::{
     Peripherals,
-    adc::{Adc, Prescaler, Reference},
+    adc::{Prescaler, Reference},
     delay_ms,
+    pin::Pin,
     lcd::Lcd4,
-    gpio::Gpio,
     pins::*,
 };
 
@@ -41,7 +41,7 @@ pub extern "C" fn main() -> ! {
     let mut led = pins.d6.into_output();
     let thermometer = pins.a0;
 
-    let mut adc = Adc::new(pd.adc, Reference::Internal2V56, Prescaler::Div8);
+    let mut adc = pd.adc.into_init(Reference::Internal2V56, Prescaler::Div8);
 
     let mut lcd = Lcd {
         d7: pins.c7.into_output(),

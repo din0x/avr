@@ -1,5 +1,8 @@
-use core::marker::PhantomData;
-use crate::{adc::Adc, pins::Pins};
+use crate::{
+    adc::Adc,
+    pins::Pins,
+    spi::{Spi, Uninit},
+};
 
 macro_rules! peripherals {
     ($($name:ident: $t:ty),* $(,)?) => {
@@ -15,7 +18,7 @@ macro_rules! peripherals {
                 unsafe {
                     Self {
                         $(
-                            $name: <$t>::steal(),
+                            $name: <$t as $crate::hal::Steal>::steal(),
                         )*
                     }
                 }
@@ -25,15 +28,7 @@ macro_rules! peripherals {
 }
 
 peripherals! {
+    adc: Adc<Uninit>,
+    spi: Spi<Uninit>,
     pins: Pins,
-    adc: Periph<Adc>,
-}
-
-/// A peripheral token, used when explicit initialization is needed.
-pub struct Periph<T>(PhantomData<T>);
-
-impl<T> Periph<T> {
-    pub unsafe fn steal() -> Self {
-        Self(PhantomData)
-    }
 }
