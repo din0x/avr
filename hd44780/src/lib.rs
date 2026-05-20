@@ -100,9 +100,9 @@ where
     #[inline(never)]
     fn send_nibble(&mut self, data: u8) {
         self.d7.set_level(Level::from((data & 0x80) > 0));
-        self.d7.set_level(Level::from((data & 0x40) > 0));
-        self.d7.set_level(Level::from((data & 0x20) > 0));
-        self.d7.set_level(Level::from((data & 0x10) > 0));
+        self.d6.set_level(Level::from((data & 0x40) > 0));
+        self.d5.set_level(Level::from((data & 0x20) > 0));
+        self.d4.set_level(Level::from((data & 0x10) > 0));
 
         self.pulse_enable();
     }
