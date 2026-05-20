@@ -30,12 +30,14 @@ fn delay(count: u32) {
     }
 }
 
+/// Pauses execution for *at least* `ms` milliseconds.
 #[inline(never)]
 pub fn delay_ms(ms: u32) {
     let us = ms * 1000;
     delay_us(us);
 }
 
+/// Pauses execution for *at least* `us` microseconds.
 #[inline(never)]
 pub fn delay_us(us: u32) {
     let ps_lp = const { (1_000_000_000 * 4) / F_CPU };
