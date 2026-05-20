@@ -1,8 +1,10 @@
-use crate::{
-    delay::{delay_ms, delay_us},
-    pin::{Pin, Output},
+#![no_std]
+
+use avr::{
+    delay_ms, delay_us,
 };
 use core::fmt;
+use hal::{Level, SetLevel};
 
 enum Command {
     ClearDisplay = 0x01,
@@ -15,35 +17,36 @@ enum Command {
     _SetDDRamAddr = 0x80,
 }
 
-pub struct Lcd4<D7, D6, D5, D4, E, Rs>
+/// A 4-bit HD44780 LCD.
+pub struct Lcd<D7, D6, D5, D4, E, Rs>
 where
-    D7: Pin,
-    D6: Pin,
-    D5: Pin,
-    D4: Pin,
-    E: Pin,
-    Rs: Pin,
+    D7: SetLevel,
+    D6: SetLevel,
+    D5: SetLevel,
+    D4: SetLevel,
+    E: SetLevel,
+    Rs: SetLevel,
 {
-    pub d7: Output<D7>,
-    pub d6: Output<D6>,
-    pub d5: Output<D5>,
-    pub d4: Output<D4>,
-    pub e: Output<E>,
-    pub rs: Output<Rs>,
+    pub d7: D7,
+    pub d6: D6,
+    pub d5: D5,
+    pub d4: D4,
+    pub e: E,
+    pub rs: Rs,
 }
 
-impl<D7, D6, D5, D4, E, Rs> Lcd4<D7, D6, D5, D4, E, Rs>
+impl<D7, D6, D5, D4, E, Rs> Lcd<D7, D6, D5, D4, E, Rs>
 where
-    D7: Pin,
-    D6: Pin,
-    D5: Pin,
-    D4: Pin,
-    E: Pin,
-    Rs: Pin,
+    D7: SetLevel,
+    D6: SetLevel,
+    D5: SetLevel,
+    D4: SetLevel,
+    E: SetLevel,
+    Rs: SetLevel,
 {
     #[inline(never)]
     pub fn init(&mut self) {
-        self.rs.write(false);
+        self.rs.set_low();
 
         // 4-bit mode
         {
@@ -88,18 +91,18 @@ where
 
     // #[inline(never)]
     fn pulse_enable(&mut self) {
-        self.e.write(true);
+        self.e.set_high();
         delay_us(1);
-        self.e.write(false);
+        self.e.set_low();
         delay_us(50);
     }
 
     #[inline(never)]
     fn send_nibble(&mut self, data: u8) {
-        self.d7.write((data & 0x80) > 0);
-        self.d6.write((data & 0x40) > 0);
-        self.d5.write((data & 0x20) > 0);
-        self.d4.write((data & 0x10) > 0);
+        self.d7.set_level(Level::from((data & 0x80) > 0));
+        self.d7.set_level(Level::from((data & 0x40) > 0));
+        self.d7.set_level(Level::from((data & 0x20) > 0));
+        self.d7.set_level(Level::from((data & 0x10) > 0));
 
         self.pulse_enable();
     }
@@ -112,28 +115,28 @@ where
 
     #[inline(never)]
     fn command(&mut self, cmd: u8) {
-        self.rs.write(false);
+        self.rs.set_low();
         self.send_byte(cmd);
         delay_us(500);
     }
 
     #[inline(never)]
     fn data(&mut self, data: u8) {
-        self.rs.write(true);
+        self.rs.set_high();
         self.send_byte(data);
-        self.rs.write(false);
+        self.rs.set_low();
         delay_us(500);
     }
 }
 
-impl<D7, D6, D5, D4, E, Rs> fmt::Write for Lcd4<D7, D6, D5, D4, E, Rs>
+impl<D7, D6, D5, D4, E, Rs> fmt::Write for Lcd<D7, D6, D5, D4, E, Rs>
 where
-    D7: Pin,
-    D6: Pin,
-    D5: Pin,
-    D4: Pin,
-    E: Pin,
-    Rs: Pin,
+    D7: SetLevel,
+    D6: SetLevel,
+    D5: SetLevel,
+    D4: SetLevel,
+    E: SetLevel,
+    Rs: SetLevel,
 {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write(s);

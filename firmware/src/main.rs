@@ -2,15 +2,11 @@
 #![no_main]
 
 use avr::{
-    Peripherals,
-    adc::{Prescaler, Reference},
-    delay_ms,
-    pin::Pin,
-    lcd::Lcd4,
+    Peripherals, Pin, delay_ms,
     pins::*,
+    {Prescaler, Reference},
 };
-
-type Lcd = Lcd4<Pc7, Pc6, Pc5, Pc4, Pd7, Pc0>;
+use hd44780::Lcd;
 
 #[panic_handler]
 fn panic(_panic_info: &core::panic::PanicInfo) -> ! {

@@ -5,13 +5,30 @@ version = 4
 [[package]]
 name = "avr"
 version = "0.1.0"
+dependencies = [
+ "hal",
+]
 
 [[package]]
 name = "firmware"
 version = "0.1.0"
 dependencies = [
  "avr",
+ "hal",
+ "hd44780",
  "itoa",
+]
+
+[[package]]
+name = "hal"
+version = "0.1.0"
+
+[[package]]
+name = "hd44780"
+version = "0.1.0"
+dependencies = [
+ "avr",
+ "hal",
 ]
 
 [[package]]

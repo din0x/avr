@@ -1,12 +1,18 @@
-use core::ptr::{read_volatile, write_volatile};
+use core::{
+    marker::PhantomData,
+    ptr::{read_volatile, write_volatile},
+};
 
-// Sets the pin into write mode.
-pub struct Output<P: Pin>(P);
+use hal::SetLevel;
+
+/// Wrapper typed for turning pins into output only.
+// PhantomData<*mut ()> is used so that Output<T>: !Send
+pub struct Output<P: Pin>(P, PhantomData<*mut ()>);
 
 impl<P: Pin> Output<P> {
     pub(crate) fn new(mut pin: P) -> Self {
         pin.enable_output();
-        Self(pin)
+        Self(pin, PhantomData)
     }
 
     pub fn toggle(&mut self) {
@@ -14,14 +20,9 @@ impl<P: Pin> Output<P> {
             write_volatile(P::PORT, read_volatile(P::PORT) ^ P::MASK);
         }
     }
+}
 
-    pub fn write(&mut self, bit: bool) {
-        match bit {
-            true => self.set_high(),
-            false => self.set_low(),
-        }
-    }
-
+impl<P: Pin> SetLevel for Output<P> {
     fn set_high(&mut self) {
         unsafe {
             write_volatile(P::PORT, read_volatile(P::PORT) | P::MASK);
@@ -35,10 +36,10 @@ impl<P: Pin> Output<P> {
     }
 }
 
+/// Marks a type as an AVR pin.
 pub unsafe trait Pin: Sized {
     const PORT: *mut u8;
     const DDR: *mut u8;
-    #[allow(unused)]
     const PIN: *mut u8;
     const MASK: u8;
 

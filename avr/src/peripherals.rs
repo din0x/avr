@@ -1,11 +1,8 @@
-use crate::{
-    adc::Adc,
-    pins::Pins,
-    spi::{Spi, Uninit},
-};
+use crate::{adc::Adc, pins::Pins, spi::Spi, state::Uninit};
 
 macro_rules! peripherals {
     ($($name:ident: $t:ty),* $(,)?) => {
+        /// `ATmega16A` peripherals.
         pub struct Peripherals {
             $(
                 #[allow(unused)]
@@ -18,7 +15,7 @@ macro_rules! peripherals {
                 unsafe {
                     Self {
                         $(
-                            $name: <$t as $crate::hal::Steal>::steal(),
+                            $name: <$t as ::hal::Steal>::steal(),
                         )*
                     }
                 }

@@ -1,5 +1,6 @@
+use crate::pin::Pin;
 use core::marker::PhantomData;
-use crate::{pin::Pin, hal::Steal};
+use hal::Steal;
 
 macro_rules! pins {
     (

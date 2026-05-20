@@ -1,11 +1,13 @@
 use crate::{
     pin::Pin,
-    hal::{SetLevel, Steal},
     pins::{Pb4, Pb5, Pb6, Pb7},
     registers::{SPCR, SPDR, SPSR},
+    state::{Master, Uninit},
 };
 use core::ptr::{read_volatile, write_volatile};
+use hal::{SetLevel, Steal};
 
+/// Serial Peripheral Interface.
 pub struct Spi<S>(S);
 
 impl Steal for Spi<Uninit> {
@@ -13,10 +15,6 @@ impl Steal for Spi<Uninit> {
         Self(Uninit)
     }
 }
-
-pub struct Uninit;
-
-pub struct Master;
 
 const SPE: u8 = 6;
 const MSTR: u8 = 4;

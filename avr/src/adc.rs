@@ -1,11 +1,12 @@
 use crate::{
-    hal::Steal,
     pins::*,
     registers::{ADCH, ADCL, ADCSRA, ADMUX},
-    spi::Uninit,
+    state::{Init, Uninit},
 };
 use core::ptr::{read_volatile, write_volatile};
+use hal::Steal;
 
+/// Analog to Digital Converter.
 pub struct Adc<S> {
     _state: S,
     reference: Reference,
@@ -21,8 +22,6 @@ impl Steal for Adc<Uninit> {
         }
     }
 }
-
-pub struct Init;
 
 impl Adc<Uninit> {
     #[inline(never)]
@@ -77,14 +76,15 @@ impl Adc<Init> {
     }
 }
 
-pub trait AdcChannel {
+/// Marks a pin as a valid source for the Analog-to-Digital Converter.
+pub unsafe trait AdcChannel {
     const CHANNEL: u8;
 }
 
 macro_rules! impl_adc_channel {
     ($($pin:ident => $channel:literal),* $(,)?) => {
         $(
-            impl AdcChannel for $pin {
+            unsafe impl AdcChannel for $pin {
                 const CHANNEL: u8 = $channel;
             }
         )*
@@ -107,6 +107,7 @@ const REFS0: u8 = 1 << 6;
 const ADEN: u8 = 1 << 7;
 const ADSC: u8 = 1 << 6;
 
+/// Reference voltage used by the Analog-to-Digital Converter.
 #[derive(Clone, Copy)]
 #[repr(u8)]
 pub enum Reference {
@@ -115,6 +116,7 @@ pub enum Reference {
     Internal2V56 = REFS1 | REFS0,
 }
 
+/// Prescaler used by the Analog-to-Digital Converter.
 #[derive(Clone, Copy)]
 #[repr(u8)]
 pub enum Prescaler {
