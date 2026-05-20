@@ -1,36 +1,38 @@
+//! AVR interrupt management.
+
 use crate::registers::SREG;
 use core::{cell::UnsafeCell, marker::PhantomData, ptr::read_volatile};
 
 #[inline(always)]
 pub fn critical_section(f: impl FnOnce(CriticalSection)) {
-    let were_enabled = disable_interrupts();
+    let were_enabled = are_enabled();
+    disable();
 
     f(CriticalSection(PhantomData));
 
     if were_enabled {
         unsafe {
-            enable_interrupts();
+            enable();
         }
     }
 }
 
-pub unsafe fn enable_interrupts() {
+/// Enables interrupts.
+pub unsafe fn enable() {
     unsafe {
         core::arch::asm!("sei");
     }
 }
 
-pub fn disable_interrupts() -> bool {
-    let were_enabled = interrupts_enabled();
-
+/// Disables interrupts.
+pub fn disable() {
     unsafe {
         core::arch::asm!("cli");
     }
-
-    were_enabled
 }
 
-fn interrupts_enabled() -> bool {
+/// Returns `true` if interrupts are enabled.
+pub fn are_enabled() -> bool {
     unsafe { read_volatile(SREG) & (1 << 7) != 0 }
 }
 

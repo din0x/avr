@@ -1,3 +1,5 @@
+//! `ATmega16A` pin defnitions.
+
 use crate::pin::Pin;
 use core::marker::PhantomData;
 use hal::Steal;

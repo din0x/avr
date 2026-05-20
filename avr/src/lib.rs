@@ -10,7 +10,7 @@ mod pin;
 mod registers;
 mod spi;
 
-pub mod interrupt;
+pub mod interrupts;
 pub mod pins;
 pub mod state;
 
