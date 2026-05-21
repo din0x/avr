@@ -46,24 +46,24 @@ impl Spi<Uninit> {
 }
 
 impl Spi<Master> {
-    pub fn transfer(&mut self, mut pin: impl SetLevel, byte: u8) -> u8 {
-        pin.set_low();
+    pub fn transfer(&mut self, mut device: Device<impl SetLevel>, byte: u8) -> u8 {
+        device.0.set_low();
 
         let r = unsafe { transfer_raw(byte) };
 
-        pin.set_high();
+        device.0.set_high();
 
         r
     }
 
-    pub fn transfer_batch(&mut self, mut pin: impl SetLevel, batch: &mut [u8]) {
-        pin.set_low();
+    pub fn transfer_batch(&mut self, mut device: Device<impl SetLevel>, batch: &mut [u8]) {
+        device.0.set_low();
 
         for byte in batch {
             *byte = unsafe { transfer_raw(*byte) }
         }
 
-        pin.set_high();
+        device.0.set_high();
     }
 }
 
@@ -78,5 +78,15 @@ unsafe fn transfer_raw(byte: u8) -> u8 {
         while read_volatile(SPSR) & (1 << SPIF) == 0 {}
 
         read_volatile(SPDR)
+    }
+}
+
+/// SPI device.
+pub struct Device<Cs: SetLevel>(Cs);
+
+impl<Cs: SetLevel> Device<Cs> {
+    pub fn new(mut cs: Cs) -> Self {
+        cs.set_high();
+        Self(cs)
     }
 }
