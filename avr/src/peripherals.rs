@@ -5,7 +5,6 @@ macro_rules! peripherals {
         /// `ATmega16A` peripherals.
         pub struct Peripherals {
             $(
-                #[allow(unused)]
                 pub $name: $t,
             )*
         }
