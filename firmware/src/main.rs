@@ -33,20 +33,18 @@ fn panic(_panic_info: &core::panic::PanicInfo) -> ! {
 pub extern "C" fn main() -> ! {
     let pd = unsafe { Peripherals::steal() };
 
-    let pins = pd.pins;
-
-    let mut led = pins.d6.into_output();
-    let thermometer = pins.a0;
+    let mut led = pd.d.6.into_output();
+    let thermometer = pd.a.0;
 
     let mut adc = pd.adc.into_init(Reference::Internal2V56, Prescaler::Div8);
 
     let mut lcd = Lcd {
-        d7: pins.c7.into_output(),
-        d6: pins.c6.into_output(),
-        d5: pins.c5.into_output(),
-        d4: pins.c4.into_output(),
-        e: pins.d7.into_output(),
-        rs: pins.c0.into_output(),
+        d7: pd.c.7.into_output(),
+        d6: pd.c.6.into_output(),
+        d5: pd.c.5.into_output(),
+        d4: pd.c.4.into_output(),
+        e: pd.d.7.into_output(),
+        rs: pd.c.0.into_output(),
     };
 
     lcd.init();

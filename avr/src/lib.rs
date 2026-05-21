@@ -1,5 +1,6 @@
 #![feature(asm_experimental_arch)]
 #![feature(unsafe_cell_access)]
+#![feature(macro_metavar_expr)]
 #![no_std]
 
 mod adc;
