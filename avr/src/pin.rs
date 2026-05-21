@@ -1,77 +1,78 @@
 //! `ATmega16A` pin defnitions.
 
-use core::{
-    marker::PhantomData,
-    ptr::{read_volatile, write_volatile},
-};
-use hal::{SetLevel, Steal};
+use core::marker::PhantomData;
+use hal::Steal;
 
-/// Wrapper typed for turning pins into output only.
-// PhantomData<*mut ()> is used so that Output<T>: !Send
-// #[doc(hidden)] as it is re-exported in lib.rs
-#[doc(hidden)]
-pub struct Out<P: Pin>(P, PhantomData<*mut ()>);
+pub(crate) mod pin_trait {
+    use core::{
+        marker::PhantomData,
+        ptr::{read_volatile, write_volatile},
+    };
+    use hal::SetLevel;
 
-impl<P: Pin> Out<P> {
-    pub(crate) fn new(mut pin: P) -> Self {
-        pin.enable_output();
-        Self(pin, PhantomData)
-    }
+    /// Wrapper typed for turning pins into output only.
+    // PhantomData<*mut ()> is used so that Output<T>: !Send
+    pub struct Out<P: Pin>(P, PhantomData<*mut ()>);
 
-    pub fn toggle(&mut self) {
-        unsafe {
-            write_volatile(P::PORT, read_volatile(P::PORT) ^ P::MASK);
+    impl<P: Pin> Out<P> {
+        pub(crate) fn new(mut pin: P) -> Self {
+            pin.enable_output();
+            Self(pin, PhantomData)
         }
-    }
-}
 
-impl<P: Pin> SetLevel for Out<P> {
-    fn set_high(&mut self) {
-        unsafe {
-            write_volatile(P::PORT, read_volatile(P::PORT) | P::MASK);
+        pub fn toggle(&mut self) {
+            unsafe {
+                write_volatile(P::PORT, read_volatile(P::PORT) ^ P::MASK);
+            }
         }
     }
 
-    fn set_low(&mut self) {
-        unsafe {
-            write_volatile(P::PORT, read_volatile(P::PORT) & !P::MASK);
+    impl<P: Pin> SetLevel for Out<P> {
+        fn set_high(&mut self) {
+            unsafe {
+                write_volatile(P::PORT, read_volatile(P::PORT) | P::MASK);
+            }
         }
-    }
-}
 
-/// Marks a type as an AVR pin.
-// #[doc(hidden)] as it is re-exported in lib.rs
-#[doc(hidden)]
-pub trait Pin: private::Sealed + Sized {
-    fn into_output(self) -> Out<Self> {
-        Out::new(self)
-    }
-
-    fn into_spi_device(self) -> crate::spi::Device<Out<Self>> {
-        crate::spi::Device::new(self.into_output())
-    }
-
-    #[doc(hidden)]
-    fn enable_output(&mut self) {
-        unsafe {
-            write_volatile(Self::DDR, read_volatile(Self::DDR) | Self::MASK);
+        fn set_low(&mut self) {
+            unsafe {
+                write_volatile(P::PORT, read_volatile(P::PORT) & !P::MASK);
+            }
         }
     }
 
-    #[doc(hidden)]
-    fn disable_output(&mut self) {
-        unsafe {
-            write_volatile(Self::DDR, read_volatile(Self::DDR) & !Self::MASK);
+    /// Marks a type as an AVR pin.
+    pub trait Pin: private::Sealed + Sized {
+        fn into_output(self) -> Out<Self> {
+            Out::new(self)
+        }
+
+        fn into_spi_device(self) -> crate::spi::Device<Out<Self>> {
+            crate::spi::Device::new(self.into_output())
+        }
+
+        #[doc(hidden)]
+        fn enable_output(&mut self) {
+            unsafe {
+                write_volatile(Self::DDR, read_volatile(Self::DDR) | Self::MASK);
+            }
+        }
+
+        #[doc(hidden)]
+        fn disable_output(&mut self) {
+            unsafe {
+                write_volatile(Self::DDR, read_volatile(Self::DDR) & !Self::MASK);
+            }
         }
     }
-}
 
-pub(crate) mod private {
-    pub unsafe trait Sealed {
-        const PORT: *mut u8;
-        const DDR: *mut u8;
-        const PIN: *mut u8;
-        const MASK: u8;
+    pub(crate) mod private {
+        pub unsafe trait Sealed {
+            const PORT: *mut u8;
+            const DDR: *mut u8;
+            const PIN: *mut u8;
+            const MASK: u8;
+        }
     }
 }
 
@@ -110,9 +111,9 @@ macro_rules! pins {
                 }
             }
 
-            impl Pin for $ty {}
+            impl pin_trait::Pin for $ty {}
 
-            unsafe impl $crate::pin::private::Sealed for $ty {
+            unsafe impl pin_trait::private::Sealed for $ty {
                 const PORT: *mut u8 = crate::registers::$port;
                 const DDR: *mut u8 = crate::registers::$ddr;
                 const PIN: *mut u8 = crate::registers::$pin;

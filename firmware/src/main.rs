@@ -3,7 +3,7 @@
 
 use avr::{
     Peripherals, Pin, delay_ms,
-    pins::*,
+    pin::*,
     {Prescaler, Reference},
 };
 use hal::Steal;

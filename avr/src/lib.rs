@@ -2,21 +2,19 @@
 #![feature(unsafe_cell_access)]
 #![no_std]
 
+mod adc;
 mod delay;
 mod peripherals;
-
-mod adc;
-mod pin;
 mod registers;
 mod spi;
 
 pub mod interrupts;
-pub mod pins;
+pub mod pin;
 pub mod state;
 
 pub use adc::{Adc, AdcChannel, Prescaler, Reference};
 pub use delay::{delay_ms, delay_us};
-pub use pin::{Output, Pin};
-pub use spi::{Device, Spi};
-
 pub use peripherals::Peripherals;
+#[doc(inline)]
+pub use pin::pin_trait::{Out, Pin};
+pub use spi::{Device, Spi};

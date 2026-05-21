@@ -1,6 +1,6 @@
 use crate::{
-    pin::Pin,
-    pins::{Pb4, Pb5, Pb6, Pb7},
+    Pin,
+    pin::{Pb4, Pb5, Pb6, Pb7},
     registers::{SPCR, SPDR, SPSR},
     state::{Master, Uninit},
 };
