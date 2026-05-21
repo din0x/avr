@@ -1,4 +1,4 @@
-use crate::{adc::Adc, pin::Pins, spi::Spi, state::Uninit};
+use crate::{Usart, adc::Adc, pin::Pins, spi::Spi, state::Uninit};
 
 macro_rules! peripherals {
     ($($name:ident: $t:ty),* $(,)?) => {
@@ -27,5 +27,6 @@ macro_rules! peripherals {
 peripherals! {
     adc: Adc<Uninit>,
     spi: Spi<Uninit>,
+    usart: Usart<Uninit>,
     pins: Pins,
 }
