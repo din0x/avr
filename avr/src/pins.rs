@@ -33,9 +33,8 @@ macro_rules! pins {
             // pins must be !Send, !Sync
             pub struct $ty(PhantomData<*mut ()>);
 
-            impl $ty {
-                #[allow(unused)]
-                pub unsafe fn steal() -> Self {
+            impl Steal for $ty {
+                unsafe fn steal() -> Self {
                     Self(PhantomData)
                 }
             }

@@ -1,8 +1,6 @@
 #![no_std]
 
-use avr::{
-    delay_ms, delay_us,
-};
+use avr::{delay_ms, delay_us};
 use core::fmt;
 use hal::{Level, SetLevel};
 

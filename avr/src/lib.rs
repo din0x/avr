@@ -17,6 +17,6 @@ pub mod state;
 pub use adc::{Adc, AdcChannel, Prescaler, Reference};
 pub use delay::{delay_ms, delay_us};
 pub use pin::{Output, Pin};
-pub use spi::Spi;
+pub use spi::{Device, Spi};
 
 pub use peripherals::Peripherals;

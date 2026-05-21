@@ -6,6 +6,7 @@ use avr::{
     pins::*,
     {Prescaler, Reference},
 };
+use hal::Steal;
 use hd44780::Lcd;
 
 #[panic_handler]

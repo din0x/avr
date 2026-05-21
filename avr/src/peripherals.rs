@@ -10,8 +10,8 @@ macro_rules! peripherals {
             )*
         }
 
-        impl Peripherals {
-            pub unsafe fn steal() -> Self {
+        impl ::hal::Steal for Peripherals {
+            unsafe fn steal() -> Self {
                 unsafe {
                     Self {
                         $(
