@@ -1,5 +1,5 @@
 use crate::{
-    pins::*,
+    pin::*,
     registers::{ADCH, ADCL, ADCSRA, ADMUX},
     state::{Init, Uninit},
 };
@@ -77,16 +77,22 @@ impl Adc<Init> {
 }
 
 /// Marks a pin as a valid source for the Analog-to-Digital Converter.
-pub unsafe trait AdcChannel {
+pub trait AdcChannel: private::Sealed {
     const CHANNEL: u8;
+}
+
+mod private {
+    pub unsafe trait Sealed {}
 }
 
 macro_rules! impl_adc_channel {
     ($($pin:ident => $channel:literal),* $(,)?) => {
         $(
-            unsafe impl AdcChannel for $pin {
+            impl AdcChannel for $pin {
                 const CHANNEL: u8 = $channel;
             }
+
+            unsafe impl private::Sealed for $pin {}
         )*
     };
 }
