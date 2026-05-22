@@ -1,5 +1,5 @@
 [workspace]
-members = ["avr", "firmware", "hd44780"]
+members = ["avr", "hal", "firmware", "hd44780"]
 resolver = "2"
 
 [profile.release]
