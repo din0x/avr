@@ -20,4 +20,4 @@ pub use peripherals::Peripherals;
 #[doc(inline)]
 pub use pin::pin_trait::{Out, Pin};
 pub use spi::{Device, Spi};
-pub use usart::{U9, Usart};
+pub use usart::{U9, Usart, UsartReader, UsartWriter};
