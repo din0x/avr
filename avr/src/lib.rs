@@ -9,6 +9,7 @@ mod peripherals;
 mod registers;
 mod spi;
 mod usart;
+mod timer;
 
 pub mod interrupts;
 pub mod pin;
@@ -21,3 +22,4 @@ pub use peripherals::Peripherals;
 pub use pin::pin_trait::{Out, Pin};
 pub use spi::{Device, Spi};
 pub use usart::{U9, Usart, UsartReader, UsartWriter};
+pub use timer::{Timer0, Normal};
