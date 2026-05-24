@@ -47,8 +47,8 @@ pub(crate) mod pin_trait {
             Out::new(self)
         }
 
-        fn into_spi_device(self) -> crate::spi::Device<Out<Self>> {
-            crate::spi::Device::new(self.into_output())
+        fn into_spi_device(self) -> hal::Device<Out<Self>> {
+            hal::Device::new(self.into_output())
         }
 
         #[doc(hidden)]

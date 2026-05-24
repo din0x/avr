@@ -21,7 +21,7 @@ impl Timer0<Uninit> {
         unsafe {
             raw::init();
         }
-        
+
         Timer0(PhantomData)
     }
 }
@@ -41,5 +41,5 @@ impl Timer0<Normal> {
 mod raw {
     pub unsafe fn init() {
         todo!()
-    } 
+    }
 }

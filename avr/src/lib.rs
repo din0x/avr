@@ -8,8 +8,8 @@ mod delay;
 mod peripherals;
 mod registers;
 mod spi;
-mod usart;
 mod timer;
+mod usart;
 
 pub mod interrupts;
 pub mod pin;
@@ -20,6 +20,6 @@ pub use delay::{delay_ms, delay_us};
 pub use peripherals::Peripherals;
 #[doc(inline)]
 pub use pin::pin_trait::{Out, Pin};
-pub use spi::{Device, Spi};
+pub use spi::Spi;
+pub use timer::{Normal, Timer0};
 pub use usart::{U9, Usart, UsartReader, UsartWriter};
-pub use timer::{Timer0, Normal};

@@ -45,3 +45,18 @@ pub trait Delay {
 
     fn delay_ms(&mut self, ms: u32);
 }
+
+/// Transfer bytes via SPI protocol.
+pub trait Transfer {
+    fn transfer_batch(&mut self, device: &mut Device<impl SetLevel>, batch: &mut [u8]);
+}
+
+/// SPI device.
+pub struct Device<Cs: SetLevel>(pub Cs);
+
+impl<Cs: SetLevel> Device<Cs> {
+    pub fn new(mut cs: Cs) -> Self {
+        cs.set_high();
+        Self(cs)
+    }
+}

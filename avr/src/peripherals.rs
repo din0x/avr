@@ -1,5 +1,9 @@
 use crate::{
-    Timer0, Usart, adc::Adc, pin::{PortA, PortB, PortC, PortD}, spi::Spi, state::Uninit
+    Timer0, Usart,
+    adc::Adc,
+    pin::{PortA, PortB, PortC, PortD},
+    spi::Spi,
+    state::Uninit,
 };
 
 macro_rules! peripherals {
