@@ -1,7 +1,7 @@
 #![no_std]
 
 use avr::{delay_ms, delay_us};
-use core::fmt;
+use core::convert::Infallible;
 use hal::{Level, SetLevel};
 
 enum Command {
@@ -73,10 +73,12 @@ where
 
     #[inline(never)]
     pub fn write(&mut self, s: &str) {
-        self.command(0x80);
-
         for b in s.bytes() {
-            self.data(b);
+            if b != b'\n' {
+                self.data(b);
+            } else {
+                self.goto_line2();
+            }
         }
     }
 
@@ -118,6 +120,10 @@ where
         delay_us(500);
     }
 
+    fn goto_line2(&mut self) {
+        self.command(0xc0);
+    }
+
     #[inline(never)]
     fn data(&mut self, data: u8) {
         self.rs.set_high();
@@ -127,7 +133,7 @@ where
     }
 }
 
-impl<D7, D6, D5, D4, E, Rs> fmt::Write for Lcd<D7, D6, D5, D4, E, Rs>
+impl<D7, D6, D5, D4, E, Rs> ufmt::uWrite for Lcd<D7, D6, D5, D4, E, Rs>
 where
     D7: SetLevel,
     D6: SetLevel,
@@ -136,7 +142,9 @@ where
     E: SetLevel,
     Rs: SetLevel,
 {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
+    type Error = Infallible;
+
+    fn write_str(&mut self, s: &str) -> Result<(), Self::Error> {
         self.write(s);
         Ok(())
     }

@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 avr = { path = "../avr", version = "0.1" }
 hal = { path = "../hal", version = "0.1" }
+ufmt = "0.2.0"
