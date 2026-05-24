@@ -1,10 +1,10 @@
 [workspace]
-members = ["avr", "hal", "firmware", "hd44780"]
+members = ["avr", "hal", "firmware", "hd44780", "adxl345"]
 resolver = "2"
 
 [profile.release]
 panic = "abort"
 lto = "fat"
-# opt-level = "s"
+opt-level = "z"
 # debug = false
 codegen-units = 1

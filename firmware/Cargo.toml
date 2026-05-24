@@ -7,4 +7,5 @@ edition = "2024"
 avr = { path = "../avr", version = "0.1" }
 hal = { path = "../hal", version = "0.1" }
 hd44780 = { path = "../hd44780", version = "0.1" }
-itoa = "1.0.18"
+adxl345 = { path = "../adxl345", version = "0.1" }
+ufmt = "0.2.0"

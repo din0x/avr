@@ -6,7 +6,7 @@ use avr::{
     pin::*,
     {Prescaler, Reference},
 };
-use hal::Steal;
+use hal::{SetLevel, Steal};
 use hd44780::Lcd;
 
 #[panic_handler]
@@ -33,10 +33,8 @@ fn panic(_panic_info: &core::panic::PanicInfo) -> ! {
 pub extern "C" fn main() -> ! {
     let pd = unsafe { Peripherals::steal() };
 
-    let mut led = pd.d.6.into_output();
-    let thermometer = pd.a.0;
-
     let mut adc = pd.adc.into_init(Reference::Internal2V56, Prescaler::Div8);
+    let mut spi = pd.spi.into_master(pd.b.4, pd.b.5, pd.b.6, pd.b.7);
 
     let mut lcd = Lcd {
         d7: pd.c.7.into_output(),
@@ -49,32 +47,25 @@ pub extern "C" fn main() -> ! {
 
     lcd.init();
     lcd.clear();
-    lcd.write("hello world");
+    ufmt::uwrite!(lcd, "hello world");
 
-    delay_ms(1000);
+    let mut led = pd.d.6.into_output();
+    led.set_high();
 
-    let mut buf = itoa::Buffer::new();
+    let thermometer = pd.a.0;
+    let mut accelerometer = adxl345::Adxl345::new(pd.b.3.into_spi_device(), &mut spi);
 
     loop {
+        let (x, y, z) = accelerometer.read_xyz_blocking(&mut spi);
+
         let voltage = adc.read_blocking(&thermometer);
         let celsius = raw_to_celsius(voltage);
 
         lcd.clear();
-        lcd.write(celsius.fmt(&mut buf));
+        ufmt::uwrite!(lcd, "x={}y={}z={}\nt={}", x, y, z, celsius);
 
         led.toggle();
         delay_ms(500);
-    }
-}
-
-trait Itoa {
-    fn fmt(self, buf: &mut itoa::Buffer) -> &str;
-}
-
-impl<I: itoa::Integer> Itoa for I {
-    #[inline(never)]
-    fn fmt(self, buf: &mut itoa::Buffer) -> &str {
-        buf.format(self)
     }
 }
 
